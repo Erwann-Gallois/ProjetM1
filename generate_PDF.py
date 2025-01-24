@@ -131,7 +131,7 @@ def generate_pdf_report(json_file, pdf_filename="rapport.pdf"):
 
 
     # Charger le logo CHU
-    logoCHU = image_to_base64("images/logoCHU.png")
+    logoCHU = image_to_base64("../images/logoCHU.png")
 
     # Génération du contenu HTML
     html_content = f"""
@@ -223,7 +223,7 @@ def generate_pdf_report(json_file, pdf_filename="rapport.pdf"):
     """
 
     # Génération du fichier PDF
-    pdf_generated = generate_pdf_from_html(html_content, "resultat/"+ pdf_filename)
+    pdf_generated = generate_pdf_from_html(html_content, "../resultat/"+ pdf_filename)
     return pdf_filename if pdf_generated else "Erreur de génération du PDF"
 
 

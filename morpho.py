@@ -6,6 +6,7 @@ import numpy as np
 import json
 from spacy.lang.fr.stop_words import STOP_WORDS
 import datetime
+import generate_PDF
 
 nlp = spacy.load('fr_core_news_lg')
 dataset_path = os.path.join(os.path.dirname(__file__), "datasets/data_fr")
@@ -247,6 +248,12 @@ def stats_morpho_all(patient_dialogue, nom_fichier, timeDiff):
     with open(os.path.join(result_path, "result_" + nom_fichier + ".json"), "w") as f:
         json.dump(json_file, f, indent=4)
     print("Fichier json généré")
+
+    pdf_filename = "rapport_" + nom_fichier + ".pdf"
+    generate_PDF.generate_pdf_report(os.path.join(result_path, "result_" + nom_fichier + ".json"), pdf_filename)
+    print(f"Rapport PDF généré: {pdf_filename}")
+
+
     print(json_file)
     return json_file
 

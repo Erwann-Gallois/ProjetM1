@@ -24,9 +24,16 @@ pip install -r requirements.txt
 
 ## Lancement du programme
 
-A faire dans l'environnement virtuel
+A faire dans l'environnement virtuel, lancer le serveur
 ```{powershell}
-python3 start.py
+cd fastAPI
+uvicorn main:app --reload
+```
+
+Dans un second terminal, lancer le client
+```{powershell}
+cd fastAPI #Si pas dans le dossier
+python request/py
 ```
 
 ## Autre
