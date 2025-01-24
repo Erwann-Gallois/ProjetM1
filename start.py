@@ -1,6 +1,7 @@
 import subprocess
 import time
 import requests
+import sys
 
 def start_server():
     """Lance le serveur FastAPI via uvicorn dans le dossier fastAPI."""
@@ -35,7 +36,7 @@ def start_client():
     """Lance le script request.py."""
     print("Lancement du client (request.py)...")
     try:
-        subprocess.run(["python", "request.py"], cwd="fastAPI")
+        subprocess.run([sys.executable, "request.py"], cwd="fastAPI")
     except Exception as e:
         print(f"Erreur lors de l'exécution du client : {e}")
 
