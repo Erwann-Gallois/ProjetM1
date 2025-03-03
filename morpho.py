@@ -1,14 +1,29 @@
 import spacy
 import os
 import pandas as pd
+import csv
 from collections import Counter
 import numpy as np
 import json
 from spacy.lang.fr.stop_words import STOP_WORDS
 import datetime
-import generate_PDF
+from nltk.corpus import wordnet as wn
 
+import nltk
+nltk.download('omw-1.4')
+mots_francais = set()
+for synset in wn.all_synsets():
+    for lemma in synset.lemmas('fra'):  # 'fra' pour le français
+        mots_francais.add(lemma.name())
 nlp = spacy.load('fr_core_news_lg')
+# Supprimer les doublons
+#dictionnaire_complet = dictionnaire_complet.drop_duplicates()
+chemin_fichier = os.path.join(os.path.dirname(__file__), 'mots_classifies.csv')
+# Lire le fichier CSV
+dictionnaire_complet = pd.read_csv(chemin_fichier)
+# affichage du resultat
+print(dictionnaire_complet)
+
 dataset_path = os.path.join(os.path.dirname(__file__), "datasets/data_fr")
 result_path = os.path.join(os.path.dirname(__file__), "resultat")
 dict_path = os.path.join(os.path.dirname(__file__), "dictionnaire")
@@ -19,6 +34,109 @@ Affin = Affin['word']
 NRC_path = os.path.join(os.path.dirname(__file__), "dictionnaire/NRC-Emotion-Lexicon/NRC-Emotion-Lexicon/OneFilePerLanguage/French-NRC-EmoLex.txt")
 Nrc = pd.read_csv(NRC_path, sep="\t")['French Word']
 df_units = pd.concat((Affin, Nrc))
+
+"""def classifier_mots(mots):
+    categories = {
+        "ACTEURS": [],
+        "OBJETS": [],
+        "LIEUX": [],
+        "ACTIONS": []
+    }
+
+    mots_classifies = []  # Liste pour stocker les mots et leurs catégories
+
+    for mot in mots:
+        doc = nlp(mot)
+        if not doc:
+            continue  # Sauter les mots vides
+        lieux_detectes = set()
+        
+        # Détection des entités nommées (Lieux, etc.)
+        for ent in doc.ents:
+            if ent.label_ in {"LOC", "GPE", "FAC"}:  # Si c'est un lieu
+                if ent.text not in categories["LIEUX"]:
+                    categories["LIEUX"].append(ent.text)
+                    lieux_detectes.add(ent.text)
+
+        # Dictionnaire temporaire pour un mot et ses catégories
+        mot_classifie = {
+            "mot": mot,
+            "ACTEURS": "",
+            "OBJETS": "",
+            "LIEUX": "",
+            "ACTIONS": ""
+        }
+
+        for token in doc:
+            if token.text in lieux_detectes:  # Ignorer les lieux déjà ajoutés
+                continue
+            if token.ent_type_ in {"LOC", "GPE", "FAC"}:  # Lieu détecté
+                if mot_classifie["LIEUX"] == "":  # Éviter les doublons
+                    mot_classifie["LIEUX"] = mot
+            elif token.pos_ == "NOUN":  # Nom commun -> Objet
+                if mot in mots_francais and mot_classifie["OBJETS"] == "":
+                    mot_classifie["OBJETS"] = mot
+            elif token.pos_ == "VERB":  # Verbe -> Action
+                if mot_classifie["ACTIONS"] == "":
+                    mot_classifie["ACTIONS"] = mot
+            elif token.pos_ == "PROPN":  # Nom propre -> Acteur
+                if mot_classifie["ACTEURS"] == "":
+                    mot_classifie["ACTEURS"] = mot
+        
+        # Ajouter le mot classifié à la liste
+        mots_classifies.append(mot_classifie)
+
+    return categories
+
+def create_uniform_df(categories, source_name):
+    # Trouver la longueur maximale parmi toutes les catégories
+    max_len = max(len(value) for value in categories.values())
+
+    # Compléter les catégories plus courtes avec des éléments vides (par exemple None)
+    for key in categories:
+        while len(categories[key]) < max_len:
+            categories[key].append(None)
+
+    # Ajouter la colonne de provenance
+    categories['provenance'] = [source_name] * max_len
+
+    # Créer le DataFrame avec toutes les colonnes de la même longueur
+    df = pd.DataFrame(categories)
+    return df
+
+
+def ajouter_provenance(df, source):
+    df['provenance'] = source
+    return df
+
+
+print(1)
+tab1 = classifier_mots(mots_francais)  # Listes de mots français
+print(2)
+tab2 = classifier_mots(Nrc)  # Liste de mots de NRC
+print(3)
+tab3 = classifier_mots(Affin)  # Liste de mots de AFINN
+print("fini")
+
+# Supprimer les duplicata dans chaque catégorie en utilisant un set
+df_tab1 = create_uniform_df(tab1, "mots_francais")
+df_tab2 = create_uniform_df(tab2, "NRC")
+df_tab3 = create_uniform_df(tab3, "AFINN")
+
+print(df_tab1.shape)
+print(df_tab2.shape)
+print(df_tab3.shape)
+
+# Convertir chaque catégorie en DataFrame
+df_tab1 = pd.DataFrame({key: value for key, value in df_tab1.items()})
+df_tab2 = pd.DataFrame({key: value for key, value in df_tab2.items()})
+df_tab3 = pd.DataFrame({key: value for key, value in df_tab3.items()})
+
+dictionnaire_complet = pd.concat([df_tab1, df_tab2, df_tab3], ignore_index=True, sort=False)
+print(dictionnaire_complet)
+dictionnaire_complet.to_csv('mots_classifies.csv', index=False, encoding='utf-8')
+
+print("Le fichier CSV a été généré avec succès.")"""
 
 def stats_words(texte):
     doc = nlp(texte)
@@ -169,22 +287,54 @@ def stats_morpho(texte):
 
 def unit_analysis(texte, timeDiff):
     doc = nlp(texte)
+
+    # Initialisation des dictionnaires et des compteurs
     has_unit = {}
     unit_ratio = {}
-    unique_concept_efficiency, unique_concept_density, total_concept_density, total_concept_efficiency = 0, 0, 0, 0
-    unit_count = Counter()
-    units_set = set(df_units.str.lower())
+    
+    unit_count = Counter()  # Compter les unités d'information par catégorie
+    unit_mention = set()  # Ensemble des unités mentionnées au moins une fois
+    
+    # Créer un set de toutes les unités d'information (en minuscules) et leur catégorie
+    units_set = set(dictionnaire_complet['unit'].str.lower())  # Unités d'information
+    categories = dictionnaire_complet['category'].unique()  # Récupérer toutes les catégories de concepts
+    
+    # Total des mots dans le texte
     total_words = len([token for token in doc if not token.is_punct and not token.is_space])
+
+    # Créer un dictionnaire pour stocker les comptages par catégorie
+    category_counts = {category: Counter() for category in categories}
+
+    # Parcourir les tokens du texte
     for token in doc:
+        # Si le lemme du token est une unité d'information
         if token.lemma_.lower() in units_set:
-            unit_count[token.lemma_.lower()] += 1
-    unit_ratio = {unit: count / total_words for unit, count in unit_count.items()}
-    unique_concept_density = len(unit_count) / total_words if total_words > 0 else 0
-    unique_concept_efficiency = len(unit_count) / timeDiff
-    total_concept_density = sum(unit_count.values()) / total_words if total_words > 0 else 0
-    total_concept_efficiency = sum(unit_count.values()) / timeDiff
-    has_unit = dict(unit_count)
+            # Trouver la catégorie de l'unité d'information
+            unit_category = dictionnaire_complet[dictionnaire_complet['unit'].str.lower() == token.lemma_.lower()]['category'].values[0]
+            # Incrémenter le compteur de cette unité dans la catégorie correspondante
+            category_counts[unit_category][token.lemma_.lower()] += 1
+            unit_mention.add(token.lemma_.lower())  # Ajouter l'unité à celles mentionnées
+    
+    # Calculer les ratios des unités d'information par rapport au total des mots
+    unit_ratio = {unit: count / total_words for category in category_counts for unit, count in category_counts[category].items()}
+    
+    # Densité des concepts uniques : unités mentionnées au moins une fois / total des mots
+    unique_concept_density = len(unit_mention) / total_words if total_words > 0 else 0
+    
+    # Efficacité des concepts uniques : unités mentionnées au moins une fois / durée (en secondes)
+    unique_concept_efficiency = len(unit_mention) / timeDiff if timeDiff > 0 else 0
+    
+    # Densité totale des concepts : total des mots faisant référence à des unités / total des mots
+    total_concept_density = sum(sum(category_counts[category].values()) for category in category_counts) / total_words if total_words > 0 else 0
+    
+    # Efficacité totale des concepts : total des mots faisant référence à des unités / durée (en secondes)
+    total_concept_efficiency = sum(sum(category_counts[category].values()) for category in category_counts) / timeDiff if timeDiff > 0 else 0
+    
+    # Retourner les résultats sous forme de dictionnaire
+    has_unit = {category: dict(category_counts[category]) for category in category_counts}
+    
     return has_unit, unit_ratio, unique_concept_efficiency, unique_concept_density, total_concept_density, total_concept_efficiency
+
 
 def export_patient_dialogue(file_path):
     try :
@@ -249,15 +399,11 @@ def stats_morpho_all(patient_dialogue, nom_fichier, timeDiff):
         json.dump(json_file, f, indent=4)
     print("Fichier json généré")
 
-    pdf_filename = "rapport_" + nom_fichier + ".pdf"
-    generate_PDF.generate_pdf_report(os.path.join(result_path, "result_" + nom_fichier + ".json"), pdf_filename)
-    print(f"Rapport PDF généré: {pdf_filename}")
-
 
     print(json_file)
     return json_file
 
 file_path = "DAMT_FR/FR_D0420-S1-T05.csv"
 timeDiff = int(datetime.timedelta(seconds = 360).total_seconds())
-file = stats_morpho_all(export_patient_dialogue(os.path.join(dataset_path, file_path)), file_path.split("/")[-1].split(".")[0], timeDiff)
+#file = stats_morpho_all(export_patient_dialogue(os.path.join(dataset_path, file_path)), file_path.split("/")[-1].split(".")[0], timeDiff)
 

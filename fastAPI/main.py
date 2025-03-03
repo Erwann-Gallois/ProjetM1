@@ -80,6 +80,8 @@ def send_phrase_partiel(texte: dict):
     texte = texte["texte"]
     time2 = datetime.datetime.now()
     timeDiff = int((time2 - time).total_seconds())
+    if(timeDiff == 0):
+        timeDiff = 1
     if not texte.strip():  
         raise HTTPException(status_code=422, detail="Texte vide ou invalide.")
     indicateurs_phrase = morpho.stats_morpho_all(texte, "indicateurs", timeDiff)

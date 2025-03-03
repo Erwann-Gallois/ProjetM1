@@ -9,11 +9,14 @@ from matplotlib.animation import FuncAnimation
 
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
 import morpho
+import generate_PDF
 
 url = "http://127.0.0.1:8000/indic/sep"
 urlInit = "http://127.0.0.1:8000/init"
 
 csv_file_path = Path(__file__).resolve().parents[1] / "datasets/data_fr/DAMT_FR/FR_D0420-S1-T05.csv"
+print(str(csv_file_path))
+result_path = os.path.join(os.path.dirname(__file__),"..", "resultat")
 
 if not csv_file_path.exists():
     print(f"Fichier CSV introuvable : {csv_file_path}")
@@ -147,8 +150,9 @@ last_emotions = {
     "surprise_rate": 0
 }
 
+
 def update(frame):
-    global requete_en_cours 
+    global requete_en_cours
     
     if frame < len(phrases) and not requete_en_cours:
         phrase = phrases[frame]
@@ -263,9 +267,14 @@ def update(frame):
 
             ax[1, 1].set_xlim(0, len(emotions_T["phrases"]))
             ax[1, 1].set_ylim(0, max(max(emotions_T["anger_rate"], default=0.1), 0.1))
-
     return line1, line2, line3, line4, lineE1, lineE2, lineE3, lineE4, lineE5, lineE6, lineT1, lineT2, lineT3, lineT4, lineTE1, lineTE2, lineTE3, lineTE4, lineTE5, lineTE6
 
 ani = FuncAnimation(fig, update, frames=len(phrases), repeat=False)
 
 plt.show()
+
+print('boop')
+pdf_filename = "rapport_seances.pdf"
+generate_PDF.generate_pdf_report(os.path.join(result_path, "result_indicateurs.json"), pdf_filename)
+print(f"Rapport PDF généré: {pdf_filename}")
+print("gundamn")
