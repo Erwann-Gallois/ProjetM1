@@ -35,7 +35,7 @@ NRC_path = os.path.join(os.path.dirname(__file__), "dictionnaire/NRC-Emotion-Lex
 Nrc = pd.read_csv(NRC_path, sep="\t")['French Word']
 df_units = pd.concat((Affin, Nrc))
 
-"""def classifier_mots(mots):
+def classifier_mots(mots):
 
     mots_classifies = [] 
 
@@ -54,18 +54,18 @@ df_units = pd.concat((Affin, Nrc))
 
 
         for token in doc:
-            if token.pos_ == "NOUN":  # Nom commun -> Objet
-                if mot in mots_francais and mot_classifie["OBJETS"] == "":
-                    mot_classifie["OBJETS"] = mot
+            if token.ent_type_ in {"LOC", "GPE", "FAC"}:  # Lieu détecté
+                if mot_classifie["LIEUX"] == "":  # Éviter les doublons
+                    mot_classifie["LIEUX"] = mot
             elif token.pos_ == "VERB":  # Verbe -> Action
                 if mot_classifie["ACTIONS"] == "":
                     mot_classifie["ACTIONS"] = mot
             elif token.pos_ == "PROPN":  # Nom propre -> Acteur
                 if mot_classifie["ACTEURS"] == "":
                     mot_classifie["ACTEURS"] = mot
-            elif token.ent_type_ in {"LOC", "GPE", "FAC"}:  # Lieu détecté
-                if mot_classifie["LIEUX"] == "":  # Éviter les doublons
-                    mot_classifie["LIEUX"] = mot
+            elif token.pos_ == "NOUN":  # Nom commun -> Objet
+                if mot in mots_francais and mot_classifie["OBJETS"] == "":
+                    mot_classifie["OBJETS"] = mot
         
         # Ajouter le mot classifié à la liste
         mots_classifies.append(mot_classifie)
@@ -132,7 +132,7 @@ dictionnaire_complet = pd.concat([df_tab1, df_tab2, df_tab3], ignore_index=True,
 print(dictionnaire_complet)
 dictionnaire_complet.to_csv('mots_classifies.csv', index=False, encoding='utf-8')
 
-print("Le fichier CSV a été généré avec succès.")"""
+print("Le fichier CSV a été généré avec succès.")
 
 def stats_words(texte):
     doc = nlp(texte)
