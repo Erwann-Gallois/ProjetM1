@@ -36,29 +36,14 @@ Nrc = pd.read_csv(NRC_path, sep="\t")['French Word']
 df_units = pd.concat((Affin, Nrc))
 
 """def classifier_mots(mots):
-    categories = {
-        "ACTEURS": [],
-        "OBJETS": [],
-        "LIEUX": [],
-        "ACTIONS": []
-    }
 
-    mots_classifies = []  # Liste pour stocker les mots et leurs catégories
+    mots_classifies = [] 
 
     for mot in mots:
         doc = nlp(mot)
         if not doc:
-            continue  # Sauter les mots vides
-        lieux_detectes = set()
+            continue 
         
-        # Détection des entités nommées (Lieux, etc.)
-        for ent in doc.ents:
-            if ent.label_ in {"LOC", "GPE", "FAC"}:  # Si c'est un lieu
-                if ent.text not in categories["LIEUX"]:
-                    categories["LIEUX"].append(ent.text)
-                    lieux_detectes.add(ent.text)
-
-        # Dictionnaire temporaire pour un mot et ses catégories
         mot_classifie = {
             "mot": mot,
             "ACTEURS": "",
@@ -67,13 +52,9 @@ df_units = pd.concat((Affin, Nrc))
             "ACTIONS": ""
         }
 
+
         for token in doc:
-            if token.text in lieux_detectes:  # Ignorer les lieux déjà ajoutés
-                continue
-            if token.ent_type_ in {"LOC", "GPE", "FAC"}:  # Lieu détecté
-                if mot_classifie["LIEUX"] == "":  # Éviter les doublons
-                    mot_classifie["LIEUX"] = mot
-            elif token.pos_ == "NOUN":  # Nom commun -> Objet
+            if token.pos_ == "NOUN":  # Nom commun -> Objet
                 if mot in mots_francais and mot_classifie["OBJETS"] == "":
                     mot_classifie["OBJETS"] = mot
             elif token.pos_ == "VERB":  # Verbe -> Action
@@ -82,13 +63,28 @@ df_units = pd.concat((Affin, Nrc))
             elif token.pos_ == "PROPN":  # Nom propre -> Acteur
                 if mot_classifie["ACTEURS"] == "":
                     mot_classifie["ACTEURS"] = mot
+            elif token.ent_type_ in {"LOC", "GPE", "FAC"}:  # Lieu détecté
+                if mot_classifie["LIEUX"] == "":  # Éviter les doublons
+                    mot_classifie["LIEUX"] = mot
         
         # Ajouter le mot classifié à la liste
         mots_classifies.append(mot_classifie)
 
-    return categories
+    return mots_classifies
 
-def create_uniform_df(categories, source_name):
+def create_uniform_df(classified_words, source_name):
+    
+    categories = {
+        "mot": [],
+        "ACTEURS": [],
+        "OBJETS": [],
+        "LIEUX": [],
+        "ACTIONS": []
+    }
+    for item in classified_words:
+        for key in categories:
+            categories[key].append(item[key])
+    
     # Trouver la longueur maximale parmi toutes les catégories
     max_len = max(len(value) for value in categories.values())
 
