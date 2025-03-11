@@ -6,6 +6,8 @@ import spacy
 from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import pandas as pd
+import numpy as np
 
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
 import morpho
@@ -34,7 +36,7 @@ if dialogue_brut is None:
     print("Erreur : Dialogue brut introuvable ou vide.")
     sys.exit(1)
     
-phrases = segmenter_phrases(dialogue_brut)
+"""phrases = segmenter_phrases(dialogue_brut)
 
 if not phrases:
     print("Erreur : Aucune phrase trouvée après segmentation.")
@@ -277,4 +279,35 @@ print('boop')
 pdf_filename = "rapport_seances.pdf"
 generate_PDF.generate_pdf_report(os.path.join(result_path, "result_indicateurs.json"), pdf_filename)
 print(f"Rapport PDF généré: {pdf_filename}")
-print("gundamn")
+print("gundamn")"""
+
+train_path = Path(__file__).resolve().parents[1] / "data_model/train.json"
+test_path = Path(__file__).resolve().parents[1] / "data_model/test.json"
+validation_path = Path(__file__).resolve().parents[1] / "data_model/validation.json"
+
+# Read the data files
+data1 = pd.read_json(train_path, lines=True)
+data2 = pd.read_json(test_path, lines=True)
+data3 = pd.read_json(validation_path, lines=True)
+
+# Combine the datasets
+combined_data = pd.concat([data1, data2, data3])
+
+# Process each dialogue
+for i in combined_data['dialogue']:
+    phrases = segmenter_phrases("".join(i))  # Assuming this returns a list of phrases
+    phrase = "".join(phrases)  # Concatenate the list of phrases into one string
+    
+    data_to_send = {
+        "texte": phrase,
+        "phrase": [phrase],
+        "indicateurs": []
+    }
+    
+    requete_en_cours = True
+    
+    response = requests.post(url, json=data_to_send)
+    if response.status_code == 200:
+        print(response.json()['indicateurs'][0])
+    else:
+        print(f"Failed to get response. Status code: {response.status_code}")

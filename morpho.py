@@ -35,7 +35,7 @@ NRC_path = os.path.join(os.path.dirname(__file__), "dictionnaire/NRC-Emotion-Lex
 Nrc = pd.read_csv(NRC_path, sep="\t")['French Word']
 df_units = pd.concat((Affin, Nrc))
 
-def classifier_mots(mots):
+"""def classifier_mots(mots):
 
     mots_classifies = [] 
 
@@ -132,7 +132,7 @@ dictionnaire_complet = pd.concat([df_tab1, df_tab2, df_tab3], ignore_index=True,
 print(dictionnaire_complet)
 dictionnaire_complet.to_csv('mots_classifies.csv', index=False, encoding='utf-8')
 
-print("Le fichier CSV a été généré avec succès.")
+print("Le fichier CSV a été généré avec succès.")"""
 
 def stats_words(texte):
     doc = nlp(texte)
@@ -281,19 +281,23 @@ def stats_morpho(texte):
     verb_w_aux = verb_aux / total_phrase
     return pos_rates, total_count, rate_conjug, rate_inf, verb_w_obj, verb_w_subj, verb_w_aux, repetition_cons, mean_prop_sub
 
+from collections import Counter
+import spacy
+
+# Assurez-vous que vous avez chargé un modèle spacy adapté
+nlp = spacy.load("fr_core_news_sm")  # Exemple pour le français
+
 def unit_analysis(texte, timeDiff):
     doc = nlp(texte)
 
     # Initialisation des dictionnaires et des compteurs
-    has_unit = {}
     unit_ratio = {}
-    
     unit_count = Counter()  # Compter les unités d'information par catégorie
     unit_mention = set()  # Ensemble des unités mentionnées au moins une fois
     
     # Créer un set de toutes les unités d'information (en minuscules) et leur catégorie
-    units_set = set(dictionnaire_complet['unit'].str.lower())  # Unités d'information
-    categories = dictionnaire_complet['category'].unique()  # Récupérer toutes les catégories de concepts
+    units_set = set(dictionnaire_complet['mot'].str.lower())  # Unités d'information (en minuscules)
+    categories = dictionnaire_complet.columns[1:-1]  # Exclure la première et la dernière colonne ('mot' et 'provenance')
     
     # Total des mots dans le texte
     total_words = len([token for token in doc if not token.is_punct and not token.is_space])
@@ -304,12 +308,14 @@ def unit_analysis(texte, timeDiff):
     # Parcourir les tokens du texte
     for token in doc:
         # Si le lemme du token est une unité d'information
-        if token.lemma_.lower() in units_set:
-            # Trouver la catégorie de l'unité d'information
-            unit_category = dictionnaire_complet[dictionnaire_complet['unit'].str.lower() == token.lemma_.lower()]['category'].values[0]
-            # Incrémenter le compteur de cette unité dans la catégorie correspondante
-            category_counts[unit_category][token.lemma_.lower()] += 1
-            unit_mention.add(token.lemma_.lower())  # Ajouter l'unité à celles mentionnées
+        lemma = token.lemma_.lower()
+        if lemma in units_set:
+            # Trouver les catégories de l'unité d'information
+            for category in categories:
+                if pd.notna(dictionnaire_complet[dictionnaire_complet['mot'].str.lower() == lemma][category].values[0]):
+                    # Incrémenter le compteur de cette unité dans la catégorie correspondante
+                    category_counts[category][lemma] += 1
+                    unit_mention.add(lemma)  # Ajouter l'unité à celles mentionnées
     
     # Calculer les ratios des unités d'information par rapport au total des mots
     unit_ratio = {unit: count / total_words for category in category_counts for unit, count in category_counts[category].items()}
@@ -401,5 +407,5 @@ def stats_morpho_all(patient_dialogue, nom_fichier, timeDiff):
 
 file_path = "DAMT_FR/FR_D0420-S1-T05.csv"
 timeDiff = int(datetime.timedelta(seconds = 360).total_seconds())
-#file = stats_morpho_all(export_patient_dialogue(os.path.join(dataset_path, file_path)), file_path.split("/")[-1].split(".")[0], timeDiff)
+file = stats_morpho_all(export_patient_dialogue(os.path.join(dataset_path, file_path)), file_path.split("/")[-1].split(".")[0], timeDiff)
 
