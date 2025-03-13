@@ -3,6 +3,8 @@ import os
 import psycopg2
 import json
 from transformers import MarianMTModel, MarianTokenizer
+import morpho
+import datetime
 
 
 # 📌 Définition de la clé API pour Gemini
@@ -67,6 +69,9 @@ for file_name, dataset_type in file_mapping.items():
 
         # Traduire le dialogue
         translated_dialogue = translate_text(dialogue)
+        str_dialogue = ' '.join(translated_dialogue)
+        timeDiff = int(datetime.timedelta(seconds = 360).total_seconds())
+        indicateur = morpho.stats_morpho_all(str_dialogue, timeDiff)
         # Insérer dans PostgreSQL
         curseur.execute("""
             INSERT INTO participants (
@@ -91,7 +96,7 @@ for file_name, dataset_type in file_mapping.items():
             participant.get("PHQ8_7_Concentration", None),
             participant.get("PHQ8_8_Psychomotor", None),
             dataset_type,  # Indiquer la provenance du fichier
-            participant.get("indicateur", None)  # Ajouter `indicateur`
+            json.dumps(indicateur)  # Ajouter `indicateur`
         ))
         connexion.commit()
         print(f"✅ Données insérées pour le participant {participant_id}.")

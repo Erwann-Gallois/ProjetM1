@@ -352,7 +352,7 @@ def export_patient_dialogue(file_path):
     return str_dialogue
 
 
-def stats_morpho_all(patient_dialogue, nom_fichier, timeDiff):
+def stats_morpho_all(patient_dialogue, timeDiff):
     pos_rates, total_word, rate_conj, rate_inf, verb_w_obj, verb_w_subj, verb_w_aux, repetition_cons, mean_prop_sub = stats_morpho(patient_dialogue)
     mean, range, std = stats_words(patient_dialogue)
     brunet_index, honore_stats, ratio_unique = lexical_diversity(patient_dialogue, 0.165)
@@ -397,15 +397,9 @@ def stats_morpho_all(patient_dialogue, nom_fichier, timeDiff):
         "total_concept_density": total_concept_density,
         "total_concept_efficiency": total_concept_efficiency
     }
-    with open(os.path.join(result_path, "result_" + nom_fichier + ".json"), "w") as f:
-        json.dump(json_file, f, indent=4)
-    print("Fichier json généré")
-
-
-    print(json_file)
     return json_file
 
-file_path = "DAMT_FR/FR_D0420-S1-T05.csv"
-timeDiff = int(datetime.timedelta(seconds = 360).total_seconds())
-file = stats_morpho_all(export_patient_dialogue(os.path.join(dataset_path, file_path)), file_path.split("/")[-1].split(".")[0], timeDiff)
+# file_path = "DAMT_FR/FR_D0420-S1-T05.csv"
+# timeDiff = int(datetime.timedelta(seconds = 360).total_seconds())
+# file = stats_morpho_all(export_patient_dialogue(os.path.join(dataset_path, file_path)), file_path.split("/")[-1].split(".")[0], timeDiff)
 
