@@ -212,6 +212,7 @@ def stats_pop(dataset, timeDiff, number_of_files=None, diversity_a=0.5):
     }
     
     for filename in list_filenames:
+        print(filename)
         file_path = os.path.join(dataset_directory, filename)
         dialogue_text = export_patient_dialogue(file_path)
         if dialogue_text is None:
@@ -271,4 +272,142 @@ def stats_pop(dataset, timeDiff, number_of_files=None, diversity_a=0.5):
     print("Fichier json généré")
 
 timeDiff = int(datetime.timedelta(seconds=360).total_seconds())
-stats_pop("DAIC-WOZ_FR2", timeDiff, number_of_files=10, diversity_a=0.5)
+
+"""
+aggregated_results = {
+        "adj_rate": [],
+        "adp_rate": [],
+        "adv_rates": [],
+        "conj_rate": [],
+        "det_rate": [],
+        "noun_rate": [],
+        "pron_rate": [],
+        "verb_rate": [],
+        "propn_rate": [],
+        "verb_aux_rate": [],
+        "verb_obj_rate": [],
+        "verb_subj_rate": [],
+        "sub_prop_rate": [],
+        "repetition_cons_rate": [],
+        "verb_conj_rate": [],
+        "verb_inf_rate": [],
+        "total_words": [],
+        "mean_freq_words": [],
+        "range_freq_words": [],
+        "std_freq_words": [],
+        "Brunet_index": [],
+        "Honore_statistic": [],
+        "TTR": [],
+        "anger_rate": [],
+        "disgust_rate": [],
+        "fear_rate": [],
+        "joy_rate": [],
+        "sadness_rate": [],
+        "surprise_rate": [],
+        "Score_AFINN": [],
+        "has_unit": [],
+        "ratio_unit": [],
+        "unique_concept_density": [],
+        "unique_concept_efficiency": [],
+        "total_concept_density": [],
+        "total_concept_efficiency": [],
+        "depressed_binary": []
+    }
+        
+        
+
+def segmenter_phrases(texte):
+    doc = nlp(texte)
+    return [phrase.text.strip() for phrase in doc.sents]
+
+diversity_a = 0.5
+
+train_path = os.path.join(os.path.dirname(__file__), "data_model/train.json")
+test_path = os.path.join(os.path.dirname(__file__), "data_model/test.json")
+validation_path = os.path.join(os.path.dirname(__file__), "data_model/validation.json")
+
+# Read the data files
+data1 = pd.read_json(train_path, lines=True)
+data2 = pd.read_json(test_path, lines=True)
+data3 = pd.read_json(validation_path, lines=True)
+
+combined_data = pd.concat([data1, data2, data3])
+
+for i in combined_data.index:
+    dat = combined_data.iloc[i]
+    phrases = segmenter_phrases("".join(dat['dialogue']))  # Assuming this returns a list of phrases
+    phrase = "".join(phrases)  # Concatenate the list of phrases into one string
+    pos_rates, total_words_count, verb_conjug_rate, verb_inf_rate, verb_obj_rate, verb_subj_rate, verb_aux_rate, repetition_cons_count, mean_subordination = stats_morpho(phrase)
+    aggregated_results["adj_rate"].append(pos_rates.get("ADJ", 0))
+    aggregated_results["adp_rate"].append(pos_rates.get("ADP", 0))
+    aggregated_results["adv_rates"].append(pos_rates.get("ADV", 0))
+    aggregated_results["conj_rate"].append(pos_rates.get("CONJ", 0))
+    aggregated_results["det_rate"].append(pos_rates.get("DET", 0))
+    aggregated_results["noun_rate"].append(pos_rates.get("NOUN", 0))
+    aggregated_results["pron_rate"].append(pos_rates.get("PRON", 0))
+    aggregated_results["verb_rate"].append(pos_rates.get("VERB", 0))
+    aggregated_results["propn_rate"].append(pos_rates.get("PROPN", 0))
+    aggregated_results["verb_aux_rate"].append(verb_aux_rate)
+    aggregated_results["verb_obj_rate"].append(verb_obj_rate)
+    aggregated_results["verb_subj_rate"].append(verb_subj_rate)
+    aggregated_results["sub_prop_rate"].append(mean_subordination)
+    aggregated_results["repetition_cons_rate"].append(repetition_cons_count)
+    aggregated_results["verb_conj_rate"].append(verb_conjug_rate)
+    aggregated_results["verb_inf_rate"].append(verb_inf_rate)
+    aggregated_results["total_words"].append(total_words_count)
+    
+    moyenne_freq, plage_freq, ecart_type_freq = stats_words(phrase)
+    aggregated_results["mean_freq_words"].append(moyenne_freq)
+    aggregated_results["range_freq_words"].append(plage_freq)
+    aggregated_results["std_freq_words"].append(ecart_type_freq)
+    
+    brunet_index, honore_statistic, ttr_value = lexical_diversity(phrase, diversity_a)
+    aggregated_results["Brunet_index"].append(brunet_index)
+    aggregated_results["Honore_statistic"].append(honore_statistic)
+    aggregated_results["TTR"].append(ttr_value)
+    
+    emotion_values = emotionnal_analysis(phrase)
+    aggregated_results["anger_rate"].append(emotion_values.get("anger", 0))
+    aggregated_results["disgust_rate"].append(emotion_values.get("disgust", 0))
+    aggregated_results["fear_rate"].append(emotion_values.get("fear", 0))
+    aggregated_results["joy_rate"].append(emotion_values.get("joy", 0))
+    aggregated_results["sadness_rate"].append(emotion_values.get("sadness", 0))
+    aggregated_results["surprise_rate"].append(emotion_values.get("surprise", 0))
+    
+    score_afinn = positif_negatif(phrase)
+    aggregated_results["Score_AFINN"].append(score_afinn)
+    
+    unit_has, unit_ratio, unique_concept_efficiency_value, unique_concept_density_value, total_concept_density_value, total_concept_efficiency_value = unit_analysis(phrase, timeDiff)
+    aggregated_results["has_unit"].append(unit_has)
+    aggregated_results["ratio_unit"].append(unit_ratio)
+    aggregated_results["unique_concept_density"].append(unique_concept_density_value)
+    aggregated_results["unique_concept_efficiency"].append(unique_concept_efficiency_value)
+    aggregated_results["total_concept_density"].append(total_concept_density_value)
+    aggregated_results["total_concept_efficiency"].append(total_concept_efficiency_value)
+    aggregated_results["depressed_binary"].append(dat["PHQ_Binary"])
+    print(dat["Participant_ID"])
+
+with open(os.path.join(result_path, "result_data.json"), "w", encoding="utf-8") as fichier_sortie:
+    json.dump(aggregated_results, fichier_sortie, indent=4,
+            default=lambda objet: objet.item() if hasattr(objet, "item") else objet)
+print("Fichier json généré")
+    """
+    
+data = os.path.join(os.path.dirname(__file__), "resultat/result_data.json")
+df = pd.read_json(data)
+df = df.select_dtypes(include=['number'])
+print(df)
+import seaborn as sns
+import matplotlib.pyplot as plt
+sns.heatmap(df.corr(), annot=False, cmap="coolwarm", linewidths=0.5)
+plt.show()
+
+df["depressed_binary"] = df["depressed_binary"].astype(str)
+
+for col in df.columns:
+    plt.figure(figsize=(8, 5))
+    sns.boxplot(x=df["depressed_binary"], y=df[col])
+    plt.title(f"Boxplot de {col} selon {"depressed_binary"}")
+    plt.xlabel("depressed_binary")
+    plt.ylabel(col)
+    plt.show()
