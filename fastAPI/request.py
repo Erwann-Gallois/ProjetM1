@@ -281,6 +281,13 @@ generate_PDF.generate_pdf_report(os.path.join(result_path, "result_indicateurs.j
 print(f"Rapport PDF généré: {pdf_filename}")
 print("gundamn")"""
 
+response_init = requests.post(urlInit)
+if response_init.status_code == 200:
+    print("Temps initialisé avec succès :", response_init.json())
+else:
+    print("Erreur lors de l'initialisation du temps :", response_init.status_code, response_init.text)
+    sys.exit(1)
+
 train_path = Path(__file__).resolve().parents[1] / "data_model/train.json"
 test_path = Path(__file__).resolve().parents[1] / "data_model/test.json"
 validation_path = Path(__file__).resolve().parents[1] / "data_model/validation.json"
