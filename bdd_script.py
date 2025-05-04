@@ -60,3 +60,26 @@ def get_dialoguefr (partie_de) :
     # Extraire les valeurs des tuples et les mettre dans une liste
     dialogues = [row[0] for row in resultats]
     return dialogues
+
+def get_labels(partie_de) :
+    """
+    Permet de retourner les labels de la base de données
+    partie_de : int
+    1 : Test
+    2 : Validation
+    3 : Train
+    """
+    if type(partie_de) != int : 
+        raise ValueError("La partie doit être un entier")
+    if partie_de > 3 or partie_de < 1 : 
+        raise ValueError("La partie doit être comprise entre 1 et 3")
+    
+    sql = """
+    SELECT PHQ_Binary FROM participants WHERE partof = %s
+    """
+    curseur.execute(sql, (partie_de,))
+    resultats = curseur.fetchall()
+
+    # Extraire les valeurs des tuples et les mettre dans une liste
+    labels = [row[0] for row in resultats]
+    return np.array(labels)
