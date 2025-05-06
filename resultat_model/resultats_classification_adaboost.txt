@@ -2,19 +2,19 @@
 Classification Report:
               precision    recall  f1-score   support
 
-           0       0.69      0.74      0.72        39
-           1       0.29      0.24      0.26        17
+           0       0.71      1.00      0.83        39
+           1       1.00      0.06      0.11        17
 
-    accuracy                           0.59        56
-   macro avg       0.49      0.49      0.49        56
-weighted avg       0.57      0.59      0.58        56
+    accuracy                           0.71        56
+   macro avg       0.85      0.53      0.47        56
+weighted avg       0.80      0.71      0.61        56
 
 
 Confusion Matrix:
-[[29 10]
- [13  4]]
+[[39  0]
+ [16  1]]
 
-ROC AUC Score: 0.4465
+ROC AUC Score: 0.5256
 
 ==================================================
 
@@ -22,19 +22,19 @@ ROC AUC Score: 0.4465
 Classification Report:
               precision    recall  f1-score   support
 
-           0       0.65      0.62      0.63        39
-           1       0.21      0.24      0.22        17
+           0       0.72      0.67      0.69        39
+           1       0.35      0.41      0.38        17
 
-    accuracy                           0.50        56
-   macro avg       0.43      0.43      0.43        56
-weighted avg       0.52      0.50      0.51        56
+    accuracy                           0.59        56
+   macro avg       0.54      0.54      0.54        56
+weighted avg       0.61      0.59      0.60        56
 
 
 Confusion Matrix:
-[[24 15]
- [13  4]]
+[[26 13]
+ [10  7]]
 
-ROC AUC Score: 0.4284
+ROC AUC Score: 0.6078
 
 ==================================================
 
@@ -42,16 +42,16 @@ ROC AUC Score: 0.4284
 Classification Report:
               precision    recall  f1-score   support
 
-           0       0.69      0.62      0.65        39
-           1       0.29      0.35      0.32        17
+           0       0.70      0.67      0.68        39
+           1       0.32      0.35      0.33        17
 
-    accuracy                           0.54        56
-   macro avg       0.49      0.48      0.48        56
-weighted avg       0.56      0.54      0.55        56
+    accuracy                           0.57        56
+   macro avg       0.51      0.51      0.51        56
+weighted avg       0.59      0.57      0.58        56
 
 
 Confusion Matrix:
-[[24 15]
+[[26 13]
  [11  6]]
 
-ROC AUC Score: 0.4548
+ROC AUC Score: 0.5030
