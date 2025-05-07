@@ -109,3 +109,20 @@ plt.title("Courbe ROC")
 plt.legend()
 plt.grid()
 plt.show()
+
+# Random Forest, AdaBoost, Gradiant Boosting, SVM
+
+# Classification report sur validation :
+#               precision    recall  f1-score   support
+
+#            0       0.82      0.91      0.86        44
+#            1       0.43      0.25      0.32        12
+
+#     accuracy                           0.77        56
+#    macro avg       0.62      0.58      0.59        56
+# weighted avg       0.73      0.77      0.74        56
+
+# ModernBERT -> recuperer representation pour lancer avec SVM, 
+# weighted avg -> moyenne ponderee
+# Comparaison entre balancer et non
+# Universal Sentence Encoder (API) 
