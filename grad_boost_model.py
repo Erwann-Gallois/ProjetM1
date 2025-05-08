@@ -4,7 +4,7 @@ from imblearn.over_sampling import SMOTE
 from bdd_script import get_indicateur, get_labels
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.utils.class_weight import compute_sample_weight
 
 # Chargement des données
@@ -42,6 +42,7 @@ y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 print(f"Précision du modèle non balancer: {accuracy:.2f}")
 print(classification_report(y_test, y_pred, zero_division=1))
+print(confusion_matrix(y_test, y_pred))
 
 
 # balancer
@@ -58,3 +59,4 @@ y_pred_bal = model_bal.predict(X_test)
 accuracy_bal = accuracy_score(y_test, y_pred_bal)
 print(f"Précision du modèle balancer: {accuracy_bal:.2f}")
 print(classification_report(y_test, y_pred_bal, zero_division=1))
+print(confusion_matrix(y_test, y_pred_bal))

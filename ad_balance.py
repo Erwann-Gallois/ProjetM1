@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from imblearn.over_sampling import SMOTE
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.tree import plot_tree
 import matplotlib.pyplot as plt
 import psycopg2
@@ -75,6 +75,7 @@ y_pred = rf.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 print(f"Précision du modèle: {accuracy:.2f}")
 print(classification_report(y_test, y_pred, zero_division=1))
+print(confusion_matrix(y_test, y_pred))
 
 importances = rf.feature_importances_
 features = X_train.columns
@@ -107,6 +108,7 @@ y_pred_filtered = rf_filtered.predict(X_test_filtered)
 accuracy_filtered = accuracy_score(y_test, y_pred_filtered)
 print(f"Précision du modèle filtre: {accuracy_filtered:.2f}")
 print(classification_report(y_test, y_pred_filtered, zero_division=1))
+print(confusion_matrix(y_test, y_pred_filtered))
 
 importances_filtered = rf_filtered.feature_importances_
 features_filtered = X_train_filtered.columns
