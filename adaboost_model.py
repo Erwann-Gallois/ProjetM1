@@ -4,7 +4,7 @@ from imblearn.over_sampling import SMOTE
 from imblearn.over_sampling import ADASYN
 from bdd_script import get_indicateur, get_labels
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, f1_score
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import StandardScaler
@@ -55,6 +55,7 @@ probs = clf_boost.predict_proba(X_val)[:, 1]  # pour l'AUC
 report = classification_report(y_val, y_pred, target_names=["0", "1"])
 conf_matrix = confusion_matrix(y_val, y_pred)
 auc_score = roc_auc_score(y_val, probs)
+f1_score_non = f1_score(y_val, y_pred, average='weighted')
 
 
 # === AdaBoost balancer ===
@@ -70,6 +71,7 @@ probs_smote = clf_boost.predict_proba(X_val)[:, 1]  # pour l'AUC
 report_bal = classification_report(y_val, y_pred_smote, target_names=["0", "1"])
 conf_matrix_bal = confusion_matrix(y_val, y_pred_smote)
 auc_score_bal = roc_auc_score(y_val, probs_smote)
+f1_score_bal = f1_score(y_val, y_pred_smote, average='weighted')
 
 
 # === ADABoost avec balancement Adasynx ===
@@ -84,6 +86,7 @@ probs_adasyn = clf_boost.predict_proba(X_val)[:, 1]  # pour l'AUC
 report_adasyn = classification_report(y_val, y_pred_adasyn, target_names=["0", "1"])
 conf_matrix_adasyn = confusion_matrix(y_val, y_pred_adasyn)
 auc_score_adasyn = roc_auc_score(y_val, probs_adasyn)
+f1_score_adasyn = f1_score(y_val, y_pred_adasyn, average='weighted')
 
 
 # Écriture dans un fichier texte
@@ -94,6 +97,7 @@ with open("resultat_model/resultats_classification_adaboost.txt", "w") as f:
     f.write("\n\nConfusion Matrix:\n")
     f.write(str(conf_matrix))
     f.write(f"\n\nROC AUC Score: {auc_score:.4f}")
+    f.write(f"\n\nF1 Score: {f1_score_non:.4f}")
     f.write("\n\n" + "="*50 + "\n\n")
     f.write("=== Résultats de la classification ADABoost SMOTE ===\n")
     f.write("Classification Report:\n")
@@ -101,6 +105,7 @@ with open("resultat_model/resultats_classification_adaboost.txt", "w") as f:
     f.write("\n\nConfusion Matrix:\n")
     f.write(str(conf_matrix_bal))
     f.write(f"\n\nROC AUC Score: {auc_score_bal:.4f}")
+    f.write(f"\n\nF1 Score: {f1_score_bal:.4f}")
     f.write("\n\n" + "="*50 + "\n\n")
     f.write("=== Résultats de la classification ADABoost avec ADASYN ===\n")
     f.write("Classification Report:\n")
@@ -108,3 +113,4 @@ with open("resultat_model/resultats_classification_adaboost.txt", "w") as f:
     f.write("\n\nConfusion Matrix:\n")
     f.write(str(conf_matrix_adasyn))
     f.write(f"\n\nROC AUC Score: {auc_score_adasyn:.4f}")
+    f.write(f"\n\nF1 Score: {f1_score_adasyn:.4f}")

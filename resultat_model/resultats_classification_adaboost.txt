@@ -2,19 +2,21 @@
 Classification Report:
               precision    recall  f1-score   support
 
-           0       0.74      0.64      0.68        39
-           1       0.36      0.47      0.41        17
+           0       0.78      0.72      0.75        39
+           1       0.45      0.53      0.49        17
 
-    accuracy                           0.59        56
-   macro avg       0.55      0.56      0.55        56
-weighted avg       0.62      0.59      0.60        56
+    accuracy                           0.66        56
+   macro avg       0.61      0.62      0.62        56
+weighted avg       0.68      0.66      0.67        56
 
 
 Confusion Matrix:
-[[25 14]
- [ 9  8]]
+[[28 11]
+ [ 8  9]]
 
-ROC AUC Score: 0.5558
+ROC AUC Score: 0.6237
+
+F1 Score: 0.6677
 
 ==================================================
 
@@ -36,6 +38,8 @@ Confusion Matrix:
 
 ROC AUC Score: 0.6621
 
+F1 Score: 0.7143
+
 ==================================================
 
 === Résultats de la classification ADABoost avec ADASYN ===
@@ -55,3 +59,5 @@ Confusion Matrix:
  [15  2]]
 
 ROC AUC Score: 0.4434
+
+F1 Score: 0.5408
