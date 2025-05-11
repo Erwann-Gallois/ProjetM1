@@ -19,10 +19,10 @@ connexion = psycopg2.connect(
 curseur = connexion.cursor()
 sql = """SELECT indicateur, phq_binary FROM participants WHERE partof = %s"""
 
-curseur.execute(sql, (1,))
+curseur.execute(sql, (3,))
 train = curseur.fetchall()
 
-curseur.execute(sql, (3,))
+curseur.execute(sql, (1,))
 test = curseur.fetchall()
 
 # data = np.concatenate([train, test])
@@ -61,10 +61,24 @@ X_test = X_test.apply(pd.to_numeric, errors="coerce").fillna(0)
 y_train = y_train.apply(pd.to_numeric, errors="coerce").fillna(0)
 y_test = y_test.apply(pd.to_numeric, errors="coerce").fillna(0)
 
+print(X_test.shape)
+print(X_train.shape)
+
+rf1 = RandomForestClassifier(n_estimators=100, random_state=42)
+
+rf1.fit(X_train, y_train)
+
+y_pred1 = rf1.predict(X_test)
+
+accuracy1 = accuracy_score(y_test, y_pred1)
+print(f"Précision du modèle non balance: {accuracy1:.2f}")
+print(classification_report(y_test, y_pred1, zero_division=1))
+print(confusion_matrix(y_test, y_pred1))
+
 sm = SMOTE()
 X_res, y_res = sm.fit_resample(X_train, y_train)
 
-rf = RandomForestClassifier(n_estimators=100, random_state=42, class_weight='balanced')
+rf = RandomForestClassifier(n_estimators=100, random_state=42)#, class_weight='balanced')
 
 rf.fit(X_res, y_res)
 
@@ -73,7 +87,7 @@ rf.fit(X_res, y_res)
 y_pred = rf.predict(X_test)
 
 accuracy = accuracy_score(y_test, y_pred)
-print(f"Précision du modèle: {accuracy:.2f}")
+print(f"Précision du modèle balance: {accuracy:.2f}")
 print(classification_report(y_test, y_pred, zero_division=1))
 print(confusion_matrix(y_test, y_pred))
 
