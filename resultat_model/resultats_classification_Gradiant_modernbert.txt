@@ -1,0 +1,54 @@
+=== Resultats de la classification Gradiant Brut ===
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.69      0.85      0.76        39
+           1       0.25      0.12      0.16        17
+
+    accuracy                           0.62        56
+   macro avg       0.47      0.48      0.46        56
+weighted avg       0.55      0.62      0.58        56
+
+Confusion Matrix:
+[[33  6]
+ [15  2]]
+
+ROC AUC Score: 0.5475
+==================================================
+
+=== Resultats de la classification Gradiant SMOTE ===
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.69      0.64      0.67        39
+           1       0.30      0.35      0.32        17
+
+    accuracy                           0.55        56
+   macro avg       0.50      0.50      0.50        56
+weighted avg       0.57      0.55      0.56        56
+
+Confusion Matrix:
+[[25 14]
+ [11  6]]
+
+ROC AUC Score: 0.4706
+==================================================
+
+=== Resultats de la classification Gradiant ADASYN ===
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.69      0.79      0.74        39
+           1       0.27      0.18      0.21        17
+
+    accuracy                           0.61        56
+   macro avg       0.48      0.49      0.48        56
+weighted avg       0.56      0.61      0.58        56
+
+Confusion Matrix:
+[[31  8]
+ [14  3]]
+
+ROC AUC Score: 0.4781
+==================================================
+

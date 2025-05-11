@@ -1,0 +1,54 @@
+=== Résultats de la classification ADABoost Brut ===
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.76      0.41      0.53        39
+           1       0.34      0.71      0.46        17
+
+    accuracy                           0.50        56
+   macro avg       0.55      0.56      0.50        56
+weighted avg       0.63      0.50      0.51        56
+
+Confusion Matrix:
+[[16 23]
+ [ 5 12]]
+
+ROC AUC Score: 0.5845
+==================================================
+
+=== Résultats de la classification ADABoost SMOTE ===
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.62      0.38      0.48        39
+           1       0.25      0.47      0.33        17
+
+    accuracy                           0.41        56
+   macro avg       0.44      0.43      0.40        56
+weighted avg       0.51      0.41      0.43        56
+
+Confusion Matrix:
+[[15 24]
+ [ 9  8]]
+
+ROC AUC Score: 0.4382
+==================================================
+
+=== Résultats de la classification ADABoost ADASYN ===
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.73      0.49      0.58        39
+           1       0.33      0.59      0.43        17
+
+    accuracy                           0.52        56
+   macro avg       0.53      0.54      0.51        56
+weighted avg       0.61      0.52      0.54        56
+
+Confusion Matrix:
+[[19 20]
+ [ 7 10]]
+
+ROC AUC Score: 0.4774
+==================================================
+

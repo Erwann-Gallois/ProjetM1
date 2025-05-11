@@ -1,4 +1,4 @@
-=== Résultats de la classification SVM non balancée ===
+=== Résultats de la classification SVM Brut ===
 Classification Report:
               precision    recall  f1-score   support
 
@@ -9,16 +9,14 @@ Classification Report:
    macro avg       0.48      0.48      0.48        56
 weighted avg       0.56      0.55      0.56        56
 
-
 Confusion Matrix:
 [[26 13]
  [12  5]]
 
 ROC AUC Score: 0.4284
-
 ==================================================
 
-=== Résultats de la classification SVM balancée ===
+=== Résultats de la classification SVM SMOTE ===
 Classification Report:
               precision    recall  f1-score   support
 
@@ -29,29 +27,28 @@ Classification Report:
    macro avg       0.48      0.48      0.41        56
 weighted avg       0.55      0.41      0.41        56
 
-
 Confusion Matrix:
 [[12 27]
  [ 6 11]]
 
 ROC AUC Score: 0.5128
-
 ==================================================
 
-=== Résultats de la classification SVM avec ADASYN ===
+=== Résultats de la classification SVM ADASYN ===
 Classification Report:
               precision    recall  f1-score   support
 
-           0       0.72      0.54      0.62        39
-           1       0.33      0.53      0.41        17
+           0       0.56      0.23      0.33        39
+           1       0.25      0.59      0.35        17
 
-    accuracy                           0.54        56
-   macro avg       0.53      0.53      0.51        56
-weighted avg       0.61      0.54      0.55        56
-
+    accuracy                           0.34        56
+   macro avg       0.41      0.41      0.34        56
+weighted avg       0.47      0.34      0.33        56
 
 Confusion Matrix:
-[[21 18]
- [ 8  9]]
+[[ 9 30]
+ [ 7 10]]
 
-ROC AUC Score: 0.6048
+ROC AUC Score: 0.4072
+==================================================
+

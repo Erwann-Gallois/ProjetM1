@@ -18,7 +18,7 @@ def get_indicateur(partie_de) :
     """
     Permet de retourner les indicateurs de la base de données
     partie_de : int
-    1 : Test
+    1 : Test 
     2 : Validation
     3 : Train
     """
