@@ -63,11 +63,9 @@ X_test_tab = scaler.transform(X_test_tab)
 encoded_train = encode_long_dialogue(get_dialoguefr(3), tokenizer, model, max_tokens, device)
 encoded_test = encode_long_dialogue(get_dialoguefr(1), tokenizer, model, max_tokens, device)
 
-X_train = encoded_train
-X_test = encoded_test
 # Fusion
-# X_train = np.concatenate((encoded_train, X_train_tab), axis=1)
-# X_test = np.concatenate((encoded_test, X_test_tab), axis=1)
+X_train = np.concatenate((encoded_train, X_train_tab), axis=1)
+X_test = np.concatenate((encoded_test, X_test_tab), axis=1)
 
 # Labels
 y_train = LabelEncoder().fit_transform(get_labels(3))
