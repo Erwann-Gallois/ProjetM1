@@ -18,13 +18,17 @@ import matplotlib.pyplot as plt
 # === Chargement des données ===
 raw_train = get_indicateur(3)
 train_df = pd.json_normalize(raw_train)
+
+# Suppression des colonnes inutiles
 colonnes_a_supprimer = [col for col in train_df.columns if col.startswith("has_unit.") or col.startswith("ratio_unit.")]
-train_df = train_df.drop(columns=colonnes_a_supprimer, errors='ignore')  # Utilisation de errors='ignore' pour éviter les erreurs
+train_df = train_df.drop(columns=colonnes_a_supprimer, errors='ignore')
+
+# On remplit les NaN par la moyenne
 train_df.fillna(train_df.mean(), inplace=True)
 
+# Chargement des données de test
 raw_test = get_indicateur(1)
 val_df = pd.json_normalize(raw_test).drop(columns=colonnes_a_supprimer, errors='ignore')
-val_df = val_df.reindex(columns=train_df.columns, fill_value=train_df.mean())  # Remplir les valeurs manquantes par la moyenne
 
 # Assurez-vous que les étiquettes sont bien des entiers et sans NaN
 y_train = get_labels(3)
@@ -44,10 +48,6 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_val = scaler.transform(X_val)
 
-# === Balancement ===
-sm = SMOTE(random_state=42)
-X_res, y_res = sm.fit_resample(X_train, y_train)
-
 # === Calcul des poids de classe ===
 sample_weights = compute_sample_weight(class_weight='balanced', y=y_train)
 
@@ -56,10 +56,7 @@ xgb_model = XGBClassifier(scale_pos_weight=sample_weights.sum() / (y_train == 1)
 rf_model = RandomForestClassifier(class_weight='balanced', random_state=42)
 
 # === Voting Classifier ===
-ensemble_model = VotingClassifier(estimators=[
-    ('xgb', xgb_model),
-    ('rf', rf_model)
-], voting='soft')
+ensemble_model = VotingClassifier(estimators=[('xgb', xgb_model), ('rf', rf_model)], voting='soft')
 
 # === Grille de recherche ===
 param_grid = {
@@ -82,6 +79,7 @@ param_grid = {
     'rf__max_features': ['auto', 'sqrt', 'log2'],
     'rf__bootstrap': [True, False],
     'rf__class_weight' : ['balanced', {0: 1, 1: 2}, {0: 1, 1: 3}]
+
 }
 
 # === Grid Search ===
@@ -117,3 +115,5 @@ plt.xlabel('Prédictions')
 plt.ylabel('Véritables Labels')
 plt.title('Matrice de Confusion')
 plt.show()
+
+# Classification Report:

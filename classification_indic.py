@@ -18,36 +18,31 @@ train_df = pd.json_normalize(raw_train)
 # Suppression des colonnes inutiles
 colonnes_a_supprimer = [col for col in train_df.columns if col.startswith("has_unit.") or col.startswith("ratio_unit.")]
 train_df = train_df.drop(columns=colonnes_a_supprimer, errors='ignore')
+
+# On remplit les NaN par la moyenne
 train_df.fillna(train_df.mean(), inplace=True)
 
-# Chargement des labels
-y_train = get_labels(3)
-y_train = pd.Series(y_train).fillna(0).astype(int).values
-
-# Chargement des données de test/validation
+# Chargement des données de test
 raw_test = get_indicateur(1)
 val_df = pd.json_normalize(raw_test).drop(columns=colonnes_a_supprimer, errors='ignore')
-val_df = val_df.reindex(columns=train_df.columns, fill_value=train_df.mean())
 
+# Assurez-vous que les étiquettes sont bien des entiers et sans NaN
+y_train = get_labels(3)
 y_val = get_labels(1)
+
+# Vérification de la présence de NaN et conversion en entiers si nécessaire
+y_train = pd.Series(y_train).fillna(0).astype(int).values
 y_val = pd.Series(y_val).fillna(0).astype(int).values
 
-# === Division stratifiée ===
-X_train, X_test, y_train, y_test = train_test_split(
+# === Division stratifiée des données ===
+X_train, X_val, y_train, y_val = train_test_split(
     train_df, y_train, test_size=0.3, stratify=y_train, random_state=42
 )
 
 # === Normalisation ===
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
-X_val = scaler.transform(val_df)
-
-# === Balancement des classes (SMOTE) ===
-print("Distribution avant SMOTE :", Counter(y_train))
-smote = SMOTE(random_state=42)
-X_train, y_train = smote.fit_resample(X_train, y_train)
-print("Distribution après SMOTE :", Counter(y_train))
+X_val = scaler.transform(X_val)
 
 
 # Définir les hyperparamètres à tester pour la recherche sur grille
