@@ -1,3 +1,4 @@
+import json
 import joblib
 import requests
 import time
@@ -31,6 +32,7 @@ voting = joblib.load('models/voting.pkl')
 
 
 csv_file_path = Path(__file__).resolve().parents[1] / "datasets/data_fr/DAMT_FR/FR_D0420-S1-T05.csv"
+json_file_path = Path(__file__).resolve().parents[1] / "data_model/train.json"
 print(str(csv_file_path))
 result_path = os.path.join(os.path.dirname(__file__),"..", "resultat")
 
@@ -44,13 +46,19 @@ def segmenter_phrases(texte):
     doc = nlp(texte)
     return [phrase.text.strip() for phrase in doc.sents]
 
-dialogue_brut = morpho.export_patient_dialogue(str(csv_file_path))
+#dialogue_brut = morpho.export_patient_dialogue(str(csv_file_path))
+data = pd.read_json(json_file_path, lines=True)
 
-if dialogue_brut is None:
+phrases = data["dialogue"][6]
+print(phrases)
+# Prédiction attendue
+prediction_attendue = data["PHQ_Binary"][6]
+
+"""if dialogue_brut is None:
     print("Erreur : Dialogue brut introuvable ou vide.")
     sys.exit(1)
     
-phrases = segmenter_phrases(dialogue_brut)
+phrases = segmenter_phrases(dialogue_brut)"""
 
 if not phrases:
     print("Erreur : Aucune phrase trouvée après segmentation.")
@@ -328,9 +336,6 @@ modeles = [
     ("SVM", svmP[0]),
     ("Voting Classifier", votingP[0])
 ]
-
-# Prédiction attendue
-prediction_attendue = 0
 
 # Création de la fenêtre
 fenetre = tk.Tk()
