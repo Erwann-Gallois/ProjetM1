@@ -12,6 +12,7 @@ from nltk.corpus import wordnet as wn
 from pathlib import Path
 
 import nltk
+nltk.download('wordnet')
 nltk.download('omw-1.4')
 mots_francais = set()
 for synset in wn.all_synsets():
@@ -466,7 +467,7 @@ diversity_a = 0.5
 
 combined_data = pd.concat([data1, data2, data3])
 
-for i in combined_data.index:
+"""for i in combined_data.index:
     dat = combined_data.iloc[i]
     phrases = segmenter_phrases("".join(dat['dialogue']))  # Assuming this returns a list of phrases
     phrase = "".join(phrases)  # Concatenate the list of phrases into one string
@@ -524,4 +525,4 @@ with open(os.path.join(result_path, "result_data.json"), "w", encoding="utf-8") 
     json.dump(aggregated_results, fichier_sortie, indent=4,
             default=lambda objet: objet.item() if hasattr(objet, "item") else objet)
 print("Fichier json généré")
-    
+    """

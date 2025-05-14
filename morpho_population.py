@@ -273,6 +273,53 @@ def stats_pop(dataset, timeDiff, number_of_files=None, diversity_a=0.5):
 
 timeDiff = int(datetime.timedelta(seconds=360).total_seconds())
 
+def stats_morpho_all(patient_dialogue, timeDiff):
+    pos_rates, total_word, rate_conj, rate_inf, verb_w_obj, verb_w_subj, verb_w_aux, repetition_cons, mean_prop_sub = stats_morpho(patient_dialogue)
+    mean, range, std = stats_words(patient_dialogue)
+    brunet_index, honore_stats, ratio_unique = lexical_diversity(patient_dialogue, 0.165)
+    emotion_dict = emotionnal_analysis(patient_dialogue)
+    score = positif_negatif(patient_dialogue)
+    has_unit, ratio_unit, unique_concept_efficiency, unique_concept_density, total_concept_density, total_concept_efficiency = unit_analysis(patient_dialogue, timeDiff)
+    json_file = {
+        "adj_rate" : pos_rates["ADJ"],
+        "adp_rate" : pos_rates["ADP"],
+        "adv_rates": pos_rates["ADV"],  
+        "conj_rate": pos_rates["CONJ"],  
+        "det_rate": pos_rates["DET"],  
+        "noun_rate": pos_rates["NOUN"],
+        "pron_rate": pos_rates["PRON"],
+        "verb_rate": pos_rates["VERB"],
+        "propn_rate": pos_rates["PROPN"],
+        "verb_aux_rate": verb_w_aux,
+        "verb_obj_rate": verb_w_obj,
+        "verb_subj_rate": verb_w_subj,
+        "sub_prop_rate": mean_prop_sub,
+        "repetition_cons_rate": repetition_cons,
+        "verb_conj_rate" : rate_conj,
+        "verb_inf_rate" : rate_inf,
+        "total_words" : total_word,
+        "mean_freq_words" : float(mean),
+        "range_freq_words" : range,
+        "std_freq_words" : float(std),
+        "Brunet_index" : brunet_index,
+        "Honore_statistic" : float(honore_stats),
+        "TTR" : ratio_unique, 
+        "anger_rate" : emotion_dict["anger"]/total_word,
+        "disgust_rate" : emotion_dict["disgust"]/total_word,
+        "fear_rate" : emotion_dict["fear"]/total_word,
+        "joy_rate" : emotion_dict["joy"]/total_word,
+        "sadness_rate" : emotion_dict["sadness"]/total_word,
+        "surprise_rate" : emotion_dict["surprise"]/total_word,
+        "Score_AFINN" : score,
+        "has_unit": has_unit,
+        "ratio_unit": ratio_unit,
+        "unique_concept_density": unique_concept_density,
+        "unique_concept_efficiency": unique_concept_efficiency,
+        "total_concept_density": total_concept_density,
+        "total_concept_efficiency": total_concept_efficiency
+    }
+    return json_file
+
 """
 aggregated_results = {
         "adj_rate": [],
@@ -393,7 +440,7 @@ with open(os.path.join(result_path, "result_data.json"), "w", encoding="utf-8") 
 print("Fichier json généré")
     """
     
-data = os.path.join(os.path.dirname(__file__), "resultat/result_data.json")
+"""data = os.path.join(os.path.dirname(__file__), "resultat/result_data.json")
 df = pd.read_json(data)
 df = df.select_dtypes(include=['number'])
 print(df)
@@ -410,4 +457,4 @@ for col in df.columns:
     plt.title(f"Boxplot de {col} selon {"depressed_binary"}")
     plt.xlabel("depressed_binary")
     plt.ylabel(col)
-    plt.show()
+    plt.show()"""

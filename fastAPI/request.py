@@ -1,3 +1,4 @@
+import joblib
 import requests
 import time
 import sys
@@ -9,12 +10,25 @@ from matplotlib.animation import FuncAnimation
 import pandas as pd
 import numpy as np
 
+
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
 import morpho
 import generate_PDF
 
 url = "http://127.0.0.1:8000/indic/sep"
 urlInit = "http://127.0.0.1:8000/init"
+
+# Chargement depuis le fichier
+adaboost = joblib.load('models/adaboost.pkl')
+grad_boost = joblib.load('models/grad_boost.pkl')
+randomForest = joblib.load('models/randomForest.pkl')
+regression = joblib.load('models/regression.pkl')
+svm = joblib.load('models/svm.pkl')
+voting = joblib.load('models/voting.pkl')
+
+# Utilisation comme d’habitude
+# predictions = modele_charge.predict(X_test)
+
 
 csv_file_path = Path(__file__).resolve().parents[1] / "datasets/data_fr/DAMT_FR/FR_D0420-S1-T05.csv"
 print(str(csv_file_path))
@@ -36,7 +50,7 @@ if dialogue_brut is None:
     print("Erreur : Dialogue brut introuvable ou vide.")
     sys.exit(1)
     
-"""phrases = segmenter_phrases(dialogue_brut)
+phrases = segmenter_phrases(dialogue_brut)
 
 if not phrases:
     print("Erreur : Aucune phrase trouvée après segmentation.")
@@ -152,7 +166,7 @@ last_emotions = {
     "surprise_rate": 0
 }
 
-
+indic = None
 def update(frame):
     global requete_en_cours
     
@@ -171,6 +185,8 @@ def update(frame):
         if response.status_code == 200:
             result = response.json()
             indicateurs_phrase = result["indicateurs"][0]
+            global indic
+            indic = indicateurs_phrase
             indicateurs["TTR"].append(indicateurs_phrase["TTR"])
             indicateurs["taux_adverbes"].append(indicateurs_phrase["adv_rates"])
             indicateurs["taux_verbes_conjugué"].append(indicateurs_phrase["verb_conj_rate"])
@@ -277,44 +293,72 @@ plt.show()
 
 print('boop')
 pdf_filename = "rapport_seances.pdf"
-generate_PDF.generate_pdf_report(os.path.join(result_path, "result_indicateurs.json"), pdf_filename)
+generate_PDF.generate_reports(os.path.join(result_path, "result_indicateurs.json"), pdf_filename)
 print(f"Rapport PDF généré: {pdf_filename}")
-print("gundamn")"""
+print("gundamn")
+tab = np.array([])
+tab2 = np.array([])
+for i in indic:
+    if(i != 'has_unit' and i != 'ratio_unit'):
+        print(i)
+        tab = np.append(tab, indic[i])
+    print(i)
+    tab2 = np.append(tab2, indic[i])
 
-response_init = requests.post(urlInit)
-if response_init.status_code == 200:
-    print("Temps initialisé avec succès :", response_init.json())
-else:
-    print("Erreur lors de l'initialisation du temps :", response_init.status_code, response_init.text)
-    sys.exit(1)
+tab = tab.reshape(1, -1)
+tab2 = tab2.reshape(1, -1)
 
-train_path = Path(__file__).resolve().parents[1] / "data_model/train.json"
-test_path = Path(__file__).resolve().parents[1] / "data_model/test.json"
-validation_path = Path(__file__).resolve().parents[1] / "data_model/validation.json"
+adaboostP = adaboost.predict(tab)
+grad_boostP = grad_boost.predict(tab)
+#randomForestP = randomForest.predict(tab2)
+regressionP = regression.predict(tab)
+svmP = svm.predict(tab)
+votingP = voting.predict(tab)
 
-# Read the data files
-data1 = pd.read_json(train_path, lines=True)
-data2 = pd.read_json(test_path, lines=True)
-data3 = pd.read_json(validation_path, lines=True)
+tab = [adaboostP, grad_boostP, regressionP, svmP, votingP]
+print(tab)
 
-# Combine the datasets
-combined_data = pd.concat([data1, data2, data3])
+import tkinter as tk
+from tkinter import ttk
 
-# Process each dialogue
-for i in combined_data['dialogue']:
-    phrases = segmenter_phrases("".join(i))  # Assuming this returns a list of phrases
-    phrase = "".join(phrases)  # Concatenate the list of phrases into one string
-    
-    data_to_send = {
-        "texte": phrase,
-        "phrase": [phrase],
-        "indicateurs": []
-    }
-    
-    requete_en_cours = True
-    
-    response = requests.post(url, json=data_to_send)
-    if response.status_code == 200:
-        print(response.json()['indicateurs'][0])
-    else:
-        print(f"Failed to get response. Status code: {response.status_code}")
+modeles = [
+    ("AdaBoost", adaboostP[0]),
+    ("Gradient Boosting", grad_boostP[0]),
+    ("Régression", regressionP[0]),
+    ("SVM", svmP[0]),
+    ("Voting Classifier", votingP[0])
+]
+
+# Prédiction attendue
+prediction_attendue = 0
+
+# Création de la fenêtre
+fenetre = tk.Tk()
+fenetre.title("Comparaison des prédictions")
+fenetre.geometry("500x250")
+
+# Partie gauche : tableau des modèles et de leurs prédictions
+frame_gauche = ttk.Frame(fenetre)
+frame_gauche.pack(side="left", padx=20, pady=20)
+
+label_gauche = ttk.Label(frame_gauche, text="Prédictions des modèles", font=('Arial', 12, 'bold'))
+label_gauche.grid(row=0, column=0, columnspan=2, pady=(0, 10))
+
+ttk.Label(frame_gauche, text="Modèle").grid(row=1, column=0, padx=5, sticky="w")
+ttk.Label(frame_gauche, text="Prédiction").grid(row=1, column=1, padx=5, sticky="w")
+
+for i, (nom, prediction) in enumerate(modeles, start=2):
+    ttk.Label(frame_gauche, text=nom).grid(row=i, column=0, sticky="w")
+    ttk.Label(frame_gauche, text=str(prediction)).grid(row=i, column=1, sticky="w")
+
+# Partie droite : prédiction attendue
+frame_droite = ttk.Frame(fenetre)
+frame_droite.pack(side="right", padx=20, pady=20)
+
+label_droite = ttk.Label(frame_droite, text="Prédiction attendue", font=('Arial', 12, 'bold'))
+label_droite.pack(pady=(0, 10))
+
+valeur = ttk.Label(frame_droite, text=str(prediction_attendue), font=('Arial', 14))
+valeur.pack()
+
+fenetre.mainloop()

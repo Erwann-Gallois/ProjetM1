@@ -44,6 +44,12 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_val = scaler.transform(X_val)
 
+# === Balancement des classes (SMOTE) ===
+print("Distribution avant SMOTE :", Counter(y_train))
+smote = SMOTE(random_state=42)
+X_train, y_train = smote.fit_resample(X_train, y_train)
+print("Distribution après SMOTE :", Counter(y_train))
+
 
 # Définir les hyperparamètres à tester pour la recherche sur grille
 param_grid = {
@@ -88,3 +94,6 @@ plt.xlabel('Prédictions')
 plt.ylabel('Véritables Labels')
 plt.title('Matrice de Confusion')
 plt.show()
+
+import joblib
+joblib.dump(best_model, 'regression.pkl')

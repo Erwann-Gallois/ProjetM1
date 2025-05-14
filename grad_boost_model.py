@@ -44,6 +44,8 @@ print(f"Précision du modèle non balancer: {accuracy:.2f}")
 print(classification_report(y_test, y_pred, zero_division=1))
 print(confusion_matrix(y_test, y_pred))
 
+import joblib
+joblib.dump(model, 'grad_boost.pkl')
 
 # balancer
 model_bal = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)

@@ -6,7 +6,7 @@ import os
 import json
 from pathlib import Path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
-import morpho
+import morpho_population as morpho
 import datetime
 
 
@@ -53,7 +53,7 @@ def send_phrase(item: Text):
     txt.texte += " " + item.texte 
     txt.phrase.append(item.texte) 
     
-    indicateurs_phrase = morpho.stats_morpho_all(txt.texte, "indicateurs", timeDiff)
+    indicateurs_phrase = morpho.stats_morpho_all(txt.texte, timeDiff)
 
     txt.indicateurs = [indicateurs_phrase] 
 

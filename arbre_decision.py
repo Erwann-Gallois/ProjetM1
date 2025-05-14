@@ -65,6 +65,9 @@ accuracy = accuracy_score(y_test, y_pred)
 print(f"Précision du modèle: {accuracy:.2f}")
 print(classification_report(y_test, y_pred, zero_division=1))
 
+import joblib
+joblib.dump(rf, 'randomForest.pkl')
+
 importances = rf.feature_importances_
 features = X_train.columns
 tree = rf.estimators_[0]

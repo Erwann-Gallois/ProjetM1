@@ -63,6 +63,8 @@ report = classification_report(y_test, y_pred, target_names=["0", "1"])
 conf_matrix = confusion_matrix(y_test, y_pred)
 auc_score = roc_auc_score(y_test, probs)
 
+import joblib
+joblib.dump(clf_boost, 'adaboost.pkl')
 
 # === AdaBoost balancer ===
 base_estimator = DecisionTreeClassifier(random_state=42)

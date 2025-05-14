@@ -117,3 +117,6 @@ plt.title('Matrice de Confusion')
 plt.show()
 
 # Classification Report:
+
+import joblib
+joblib.dump(best_model, 'voting.pkl')

@@ -94,6 +94,8 @@ probs_adasyn = svm_clf.predict_proba(X_test)[:, 1]  # pour l'AUC
 report_adasyn = classification_report(y_test, y_pred_adasyn, target_names=["0", "1"])
 conf_matrix_adasyn = confusion_matrix(y_test, y_pred_adasyn)
 auc_score_adasyn = roc_auc_score(y_test, probs_adasyn)
+import joblib
+joblib.dump(svm_clf, 'svm.pkl')
 
 # Courbe de perte
 # plot_log_loss_curve_with_split(svm_clf, X_res_adasyn, y_res_adasyn, X_val, y_val, "courbe_perte_adaboost_adasyn")
